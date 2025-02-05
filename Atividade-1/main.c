@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
-#define PIN_LED_RED 11
-#define PIN_LED_GREEN 12
-#define PIN_LED_BLUE 13
+#define PIN_LED_GREEN 11
+#define PIN_LED_BLUE 12
+#define PIN_LED_RED 13
 #define TIMER_INTERVAL_TEMP 3000
 #define TIMER_SLEEP 1000
 
