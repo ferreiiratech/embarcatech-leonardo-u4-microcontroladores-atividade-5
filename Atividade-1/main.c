@@ -33,12 +33,7 @@ bool repeating_timer_callback(struct repeating_timer *t)
         break;
     }
 
-    traffic_light_on += 1;
-
-    if (traffic_light_on >= 3)
-    {
-        traffic_light_on = 0;
-    }
+    traffic_light_on = (traffic_light_on + 1) % 3;
 
     return true;
 }
