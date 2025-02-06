@@ -12,11 +12,21 @@ const uint64_t DEBOUNCE_TIME = 500000;     // Tempo de debounce em microssegundo
 volatile uint64_t last_interrupt_time = 0; // Tempo da última interrupção do botão A
 volatile bool status_led = false; // Variável para controlar o estado do LED
 
+int64_t turn_off_red_led(alarm_id_t id, void *user_data)
+{
+    gpio_put(PIN_LED_RED, false);    
+    status_led = false; // Atualiza o estado do LED para que o botão A possa iniciar o ciclo novamente
+    
+    return 0;
+}
+
 int64_t turn_off_blue_led(alarm_id_t id, void *user_data)
 {
     gpio_put(PIN_LED_BLUE, false);
-    status_led = false; // Atualiza o estado do LED para que o botão A possa iniciar o ciclo novamente
-
+    
+    // Adiciona um alarme para desligar o LED verde após 3 segundos
+    add_alarm_in_ms(TIMER_INTERVAL_ALARM, turn_off_red_led, NULL, false);
+    
     return 0;
 }
 
@@ -26,16 +36,6 @@ int64_t turn_off_green_led(alarm_id_t id, void *user_data)
 
     // Adiciona um alarme para desligar o LED azul após 3 segundos
     add_alarm_in_ms(TIMER_INTERVAL_ALARM, turn_off_blue_led, NULL, false);
-
-    return 0;
-}
-
-int64_t turn_off_red_led(alarm_id_t id, void *user_data)
-{
-    gpio_put(PIN_LED_RED, false);
-
-    // Adiciona um alarme para desligar o LED verde após 3 segundos
-    add_alarm_in_ms(TIMER_INTERVAL_ALARM, turn_off_green_led, NULL, false);
 
     return 0;
 }
@@ -58,12 +58,14 @@ void button_isr(uint gpio, uint32_t events)
         status_led = true;
 
         // Adiciona um alarme para desligar o LED vermelho após 3 segundos
-        add_alarm_in_ms(TIMER_INTERVAL_ALARM, turn_off_red_led, NULL, false);
+        add_alarm_in_ms(TIMER_INTERVAL_ALARM, turn_off_green_led, NULL, false);
     }
 }
 
 int main()
 {
+    stdio_init_all();
+    
     // Inicialização do pino vermelho 
     gpio_init(PIN_LED_RED);
     gpio_set_dir(PIN_LED_RED, GPIO_OUT);
